@@ -10,6 +10,7 @@ import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
+import requests  # Import the requests library
 
 # Download stopwords
 try:
@@ -33,7 +34,8 @@ model = keras.models.load_model(model_file_path)
 max_words = 10000
 max_len = 100
 tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
-tokenizer.fit_on_texts([])  # You might want to use your training data here
+# You should load your training data and fit the tokenizer on it
+# tokenizer.fit_on_texts(training_data)  # Uncomment and provide your training data
 
 # Remove stopwords
 stop_words = set(stopwords.words('english'))
@@ -49,7 +51,19 @@ def preprocess_text(text):
 # Define Flask routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Vercel app URL with the path to index.html
+    vercel_url = 'https://sentimentanalysis-arvils-projects.vercel.app/'
+
+    # Fetch the HTML content from Vercel
+    response = requests.get(vercel_url)
+
+    # Render the fetched HTML content
+    return response.text
+
+@app.route('/predict_sentiment', methods=['POST'])
+def predict_sentiment_route():
+    # ... (rest of your code for sentiment prediction)
+
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
