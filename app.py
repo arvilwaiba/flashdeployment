@@ -31,20 +31,15 @@ try:
 except LookupError:
     nltk.download('stopwords')
 
-from flask_cors import CORS
-
 app = Flask(__name__)
 CORS(app)
 run_with_ngrok(app)  # Start ngrok when the app is run
 
-# Upload the pre-trained model file
-uploaded_model = files.upload()
-
-# Get the model file name
-model_file_name = list(uploaded_model.keys())[0]
+# Specify the path to your model file
+model_file_path = '/Users/arvilwaiba/desktop/flash/model.h5'
 
 # Load your pre-trained sentiment analysis model
-model = keras.models.load_model(model_file_name)
+model = keras.models.load_model(model_file_path)
 
 # Load the Tokenizer
 max_words = 10000
@@ -89,7 +84,3 @@ def predict_sentiment_route():
     predicted_sentiment = sentiment_mapping[predicted_label]
 
     return jsonify({'sentiment': predicted_sentiment})
-
-# Run the Flask app
-if __name__ == '__main__':
-    app.run()
