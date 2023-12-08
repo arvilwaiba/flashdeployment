@@ -1,4 +1,3 @@
-
 # Install necessary libraries
 !pip install flask
 !pip install flask-ngrok
@@ -24,7 +23,6 @@ except LookupError:
     nltk.download('stopwords')
 
 app = Flask(__name__)
-CORS(app)
 run_with_ngrok(app)  # Start ngrok when the app is run
 
 # Specify the path to your model file
@@ -51,7 +49,7 @@ def preprocess_text(text):
     return ' '.join(words)
 
 # Define Flask routes
-@app.route('https://sentimentanalysis-arvils-projects.vercel.app/')
+@app.route('/')
 def index():
     return render_template('index.html')
 
@@ -76,3 +74,5 @@ def predict_sentiment_route():
     predicted_sentiment = sentiment_mapping[predicted_label]
 
     return jsonify({'sentiment': predicted_sentiment})
+
+
