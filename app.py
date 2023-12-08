@@ -11,6 +11,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
 import requests  # Import the requests library
+from flask_cors import CORS
 
 # Download stopwords
 try:
@@ -20,6 +21,7 @@ except LookupError:
 
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
+CORS(app)
 
 # Get the absolute path to the current directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
