@@ -53,14 +53,7 @@ def preprocess_text(text):
 # Define Flask routes
 @app.route('/')
 def index():
-    # Vercel app URL (base URL)
-    vercel_url = 'https://sentimentanalysis-qs43yt43n-arvils-projects.vercel.app/'
-
-    # Fetch the HTML content from Vercel
-    response = requests.get(vercel_url)
-
-    # Render the fetched HTML content
-    return response.text
+    return render_template('index.html')
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
