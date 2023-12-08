@@ -52,7 +52,7 @@ def preprocess_text(text):
 @app.route('/')
 def index():
     # Vercel app URL (base URL)
-    vercel_url = 'https://sentimentanalysis-arvils-projects.vercel.app/'
+    vercel_url = 'https://sentimentanalysis-qs43yt43n-arvils-projects.vercel.app/'
 
     # Fetch the HTML content from Vercel
     response = requests.get(vercel_url)
