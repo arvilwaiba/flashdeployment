@@ -51,7 +51,7 @@ def preprocess_text(text):
 # Define Flask routes
 @app.route('/')
 def index():
-    # Vercel app URL with the path to index.html
+    # Vercel app URL (base URL)
     vercel_url = 'https://sentimentanalysis-arvils-projects.vercel.app/'
 
     # Fetch the HTML content from Vercel
