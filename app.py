@@ -25,8 +25,11 @@ except LookupError:
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
 
-# Specify the path to your model file
-model_file_path = '/Users/arvilwaiba/desktop/flash/model.h5'
+# Get the absolute path to the current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Specify the path to your model file (assuming it's in the same directory)
+model_file_path = os.path.join(current_dir, 'your_model_file.h5')
 
 # Load your pre-trained sentiment analysis model
 model = keras.models.load_model(model_file_path)
