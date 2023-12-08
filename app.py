@@ -1,9 +1,5 @@
-# Install necessary libraries
-!pip install flask
-!pip install flask-ngrok
-!pip install flask-cors
-
 # Import required libraries
+import os
 from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
 from tensorflow import keras
@@ -14,7 +10,6 @@ import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
-
 
 # Download stopwords
 try:
@@ -29,7 +24,7 @@ run_with_ngrok(app)  # Start ngrok when the app is run
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Specify the path to your model file (assuming it's in the same directory)
-model_file_path = os.path.join(current_dir, 'your_model_file.h5')
+model_file_path = os.path.join(current_dir, 'model.h5')
 
 # Load your pre-trained sentiment analysis model
 model = keras.models.load_model(model_file_path)
@@ -77,5 +72,3 @@ def predict_sentiment_route():
     predicted_sentiment = sentiment_mapping[predicted_label]
 
     return jsonify({'sentiment': predicted_sentiment})
-
-
