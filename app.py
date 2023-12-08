@@ -12,8 +12,6 @@ from nltk.tokenize import word_tokenize
 import nltk
 import requests  # Import the requests library
 
-pip install flask-cors
-
 # Download stopwords
 try:
     nltk.data.find('corpora/stopwords')
