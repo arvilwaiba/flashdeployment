@@ -18,6 +18,13 @@ try:
 except LookupError:
     nltk.download('stopwords')
 
+# Download punkt resource
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', download_dir='/opt/render/nltk_data')
+
+
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
 
