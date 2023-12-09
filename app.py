@@ -23,30 +23,7 @@ except LookupError:
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
 
-# Get the absolute path to the current directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Specify the path to your model file (assuming it's in the same directory)
-model_file_path = os.path.join(current_dir, 'model.h5')
-
-# Load your pre-trained sentiment analysis model
-model = keras.models.load_model(model_file_path)
-
-# Load the Tokenizer
-max_words = 10000
-max_len = 100
-tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
-
-# Remove stopwords
-stop_words = set(stopwords.words('english'))
-
-# Preprocess text function
-def preprocess_text(text):
-    text = text.lower()
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    words = word_tokenize(text)
-    words = [word for word in words if word not in stop_words]
-    return ' '.join(words)
+# ... (rest of your code)
 
 # Define Flask routes
 @app.route('/')
@@ -57,9 +34,11 @@ def index():
 def predict_sentiment_route():
     try:
         data = request.get_json()
-        text = data.get('text', '')  # Use an empty string as the default value if 'text' is not present
 
-        if text is not None:
+        # Use get() method to handle missing or None value for 'text'
+        text = data.get('text', '')
+
+        if text:
             # Preprocess the text
             preprocessed_text = preprocess_text(text)
 
@@ -83,7 +62,7 @@ def predict_sentiment_route():
             return response
 
         else:
-            return Response(response=json.dumps({'error': 'Text is missing'}),
+            return Response(response=json.dumps({'error': 'Text is missing or empty'}),
                             status=400,
                             mimetype="application/json")
 
