@@ -10,15 +10,20 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
 from flask_cors import CORS
-from flask import Response
-import json
-import traceback  # Import the traceback module for logging exceptions
+from flask import Response, json
+import traceback  # Import the traceback module
 
 # Download stopwords
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
+
+# Download punkt tokenizer
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 app = Flask(__name__)
 run_with_ngrok(app)
@@ -83,9 +88,7 @@ def predict_sentiment_route():
         return response
 
     except Exception as e:
-        # Log the exception details
-        traceback.print_exc()
+        print("Exception:", e)
+        traceback.print_exc()  # Print traceback for detailed error information
         return jsonify({'error': 'Internal Server Error'}), 500
 
-if __name__ == "__main__":
-    app.run()
