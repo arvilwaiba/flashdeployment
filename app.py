@@ -39,7 +39,6 @@ tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
 stop_words = set(stopwords.words('english'))
 
 def preprocess_text(text):
-    print("Original Text:", text)
     # Convert to lowercase
     text = text.lower()
     # Remove special characters, numbers, and punctuation
@@ -48,11 +47,7 @@ def preprocess_text(text):
     words = word_tokenize(text)
     # Remove stopwords
     words = [word for word in words if word not in stop_words]
-    if not words:
-        return None, None  # Return None for empty sequences
-    preprocessed_text = ' '.join(words)
-    print("Preprocessed Text:", preprocessed_text)
-    return preprocessed_text, words
+    return ' '.join(words) if words else ''
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
