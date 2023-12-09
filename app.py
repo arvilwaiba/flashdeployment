@@ -1,7 +1,7 @@
 import os
 import re
 import traceback
-from flask import Flask, request, jsonify, render_template, Response, json
+from flask import Flask, request, jsonify, Response, json
 from flask_cors import CORS
 from flask_ngrok import run_with_ngrok
 from nltk.corpus import stopwords
@@ -62,10 +62,10 @@ def predict_sentiment_route():
             print("Error: Empty preprocessed text")
             return jsonify({'error': 'Empty preprocessed text'}), 400
 
-        print("Preprocessed Text:", preprocessed_text)
-
-
+        # Tokenize and pad sequence
+        sequence = tokenizer.texts_to_sequences([preprocessed_text])
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
+
         print("Padded Sequence:", padded_sequence)
 
         prediction = model.predict(padded_sequence)
