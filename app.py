@@ -1,6 +1,6 @@
 # Import required libraries
 import os
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, Response
 from flask_ngrok import run_with_ngrok
 from tensorflow import keras
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -10,9 +10,6 @@ import re
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
-import requests  # Import the requests library
-from flask_cors import CORS
-from flask import Response
 import json
 
 # Download stopwords
@@ -23,7 +20,6 @@ except LookupError:
 
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
-CORS(app)
 
 # Get the absolute path to the current directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -59,27 +55,37 @@ def index():
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
-    data = request.get_json()
-    text = data['text']
+    try:
+        data = request.get_json()
+        text = data['text']
 
-    # Preprocess the text
-    preprocessed_text = preprocess_text(text)
+        # Preprocess the text
+        preprocessed_text = preprocess_text(text)
 
-    # Tokenize and pad the sequence
-    sequence = tokenizer.texts_to_sequences([preprocessed_text])
-    padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
+        # Tokenize and pad the sequence
+        sequence = tokenizer.texts_to_sequences([preprocessed_text])
+        padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
-    # Make prediction
-    prediction = model.predict(padded_sequence)
-    predicted_label = np.argmax(prediction)
+        # Make prediction
+        prediction = model.predict(padded_sequence)
+        predicted_label = np.argmax(prediction)
 
-    # Map predicted label to sentiment class
-    sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
-    predicted_sentiment = sentiment_mapping[predicted_label]
+        # Map predicted label to sentiment class
+        sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
+        predicted_sentiment = sentiment_mapping[predicted_label]
 
-    # Explicitly set content type to JSON
-    response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
-                        status=200,
+        # Explicitly set content type to JSON
+        response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
+                            status=200,
+                            mimetype="application/json")
+
+        return response
+
+    except Exception as e:
+        app.logger.error(str(e))
+        return Response(response=json.dumps({'error': 'Internal Server Error'}),
+                        status=500,
                         mimetype="application/json")
 
-    return response
+if __name__ == '__main__':
+    app.run(debug=True)
