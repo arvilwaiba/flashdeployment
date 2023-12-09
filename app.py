@@ -12,18 +12,13 @@ from nltk.tokenize import word_tokenize
 import nltk
 import json
 
-# Download stopwords
+# Download stopwords and punkt resource
 try:
     nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-
-# Download punkt resource
-try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
+    nltk.download('stopwords', download_dir='/opt/render/nltk_data')
     nltk.download('punkt', download_dir='/opt/render/nltk_data')
-
 
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when the app is run
@@ -41,8 +36,6 @@ model = keras.models.load_model(model_file_path)
 max_words = 10000
 max_len = 100
 tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
-# You should load your training data and fit the tokenizer on it
-# tokenizer.fit_on_texts(training_data)  # Uncomment and provide your training data
 
 # Remove stopwords
 stop_words = set(stopwords.words('english'))
@@ -64,29 +57,35 @@ def index():
 def predict_sentiment_route():
     try:
         data = request.get_json()
-        text = data['text']
+        text = data.get('text', '')  # Use an empty string as the default value if 'text' is not present
 
-        # Preprocess the text
-        preprocessed_text = preprocess_text(text)
+        if text is not None:
+            # Preprocess the text
+            preprocessed_text = preprocess_text(text)
 
-        # Tokenize and pad the sequence
-        sequence = tokenizer.texts_to_sequences([preprocessed_text])
-        padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
+            # Tokenize and pad the sequence
+            sequence = tokenizer.texts_to_sequences([preprocessed_text])
+            padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
-        # Make prediction
-        prediction = model.predict(padded_sequence)
-        predicted_label = np.argmax(prediction)
+            # Make prediction
+            prediction = model.predict(padded_sequence)
+            predicted_label = np.argmax(prediction)
 
-        # Map predicted label to sentiment class
-        sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
-        predicted_sentiment = sentiment_mapping[predicted_label]
+            # Map predicted label to sentiment class
+            sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
+            predicted_sentiment = sentiment_mapping.get(predicted_label, 'unknown')
 
-        # Explicitly set content type to JSON
-        response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
-                            status=200,
+            # Explicitly set content type to JSON
+            response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
+                                status=200,
+                                mimetype="application/json")
+
+            return response
+
+        else:
+            return Response(response=json.dumps({'error': 'Text is missing'}),
+                            status=400,
                             mimetype="application/json")
-
-        return response
 
     except Exception as e:
         app.logger.error(str(e))
