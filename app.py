@@ -12,6 +12,8 @@ from nltk.tokenize import word_tokenize
 import nltk
 import requests  # Import the requests library
 from flask_cors import CORS
+from flask import Response
+import json
 
 # Download stopwords
 try:
@@ -75,4 +77,9 @@ def predict_sentiment_route():
     sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
     predicted_sentiment = sentiment_mapping[predicted_label]
 
-    return jsonify({'sentiment': predicted_sentiment})
+    # Explicitly set content type to JSON
+    response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
+                        status=200,
+                        mimetype="application/json")
+
+    return response
