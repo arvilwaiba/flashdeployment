@@ -64,11 +64,16 @@ def predict_sentiment_route():
 
         # Tokenize and pad sequence
         sequence = tokenizer.texts_to_sequences([preprocessed_text])
+
+        if not sequence:
+            print("Error: Unable to convert text to sequence")
+            return jsonify({'error': 'Unable to convert text to sequence'}), 400
+
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
         print("Padded Sequence:", padded_sequence)
 
-        prediction = model.predict(padded_sequence)
+        prediction = sentiment_model.predict(padded_sequence)
         predicted_label = np.argmax(prediction)
 
         sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
@@ -84,6 +89,7 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run()
