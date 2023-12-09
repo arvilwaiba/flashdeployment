@@ -63,10 +63,19 @@ def index():
 def predict_sentiment_route():
     try:
         data = request.get_json()
-        text = data['text']
+        text = data.get('text')  # Use get to handle the case where 'text' is not in the JSON
+
+        # Print input text for debugging
+        print("Input Text:", text)
+
+        if text is None:
+            return jsonify({'error': 'Missing or invalid input text'}), 400
 
         # Preprocess the text
         preprocessed_text = preprocess_text(text)
+
+        # Print preprocessed text for debugging
+        print("Preprocessed Text:", preprocessed_text)
 
         # Tokenize and pad the sequence
         sequence = tokenizer.texts_to_sequences([preprocessed_text])
@@ -91,4 +100,3 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()  # Print traceback for detailed error information
         return jsonify({'error': 'Internal Server Error'}), 500
-
