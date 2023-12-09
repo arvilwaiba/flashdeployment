@@ -84,7 +84,12 @@ def predict_sentiment_route():
         if not sequence or not sequence[0]:
             return jsonify({'error': 'Unable to tokenize the input text'}), 400
 
+        print("Tokenized Sequence:", sequence)
+
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
+
+        # Print padded sequence for debugging
+        print("Padded Sequence:", padded_sequence)
 
         # Make prediction
         prediction = model.predict(padded_sequence)
@@ -105,4 +110,5 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()  # Print traceback for detailed error information
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
