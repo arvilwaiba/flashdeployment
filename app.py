@@ -79,6 +79,11 @@ def predict_sentiment_route():
 
         # Tokenize and pad the sequence
         sequence = tokenizer.texts_to_sequences([preprocessed_text])
+
+        # Handle the case where the sequence is None
+        if not sequence:
+            return jsonify({'error': 'Unable to tokenize the input text'}), 400
+
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
         # Make prediction
