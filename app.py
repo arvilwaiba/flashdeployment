@@ -48,11 +48,10 @@ stop_words = set(stopwords.words('english'))
 
 # Preprocess text function
 def preprocess_text(text):
-    text = text.lower()
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    words = word_tokenize(text)
-    words = [word for word in words if word not in stop_words]
-    return ' '.join(words)
+    print("Original Text:", text)
+    # Your existing preprocessing code...
+    print("Preprocessed Text:", preprocessed_text)
+    return preprocessed_text
 
 # Define Flask routes
 @app.route('/')
@@ -78,13 +77,15 @@ def predict_sentiment_route():
         print("Preprocessed Text:", preprocessed_text)
 
         # Tokenize and pad the sequence
-        sequence = tokenizer.texts_to_sequences([preprocessed_text])
+sequence = tokenizer.texts_to_sequences([preprocessed_text])
 
-        # Handle the case where the sequence is None or empty
-        if not sequence or not sequence[0]:
-            return jsonify({'error': 'Unable to tokenize the input text'}), 400
+# Handle the case where the sequence is None or empty
+if not sequence or not sequence[0]:
+    print("Error: Unable to tokenize the input text")
+    return jsonify({'error': 'Unable to tokenize the input text'}), 400
 
-        print("Tokenized Sequence:", sequence)
+print("Tokenized Sequence:", sequence)
+
 
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
