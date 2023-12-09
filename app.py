@@ -40,19 +40,20 @@ stop_words = set(stopwords.words('english'))
 
 def preprocess_text(text):
     print("Original Text:", text)
-    # Include your existing preprocessing code...
-    # For example:
+    # Convert to lowercase
     text = text.lower()
+    # Remove special characters, numbers, and punctuation
     text = re.sub(r'[^a-zA-Z\s]', '', text)
+    # Tokenize
     words = word_tokenize(text)
+    # Remove stopwords
     words = [word for word in words if word not in stop_words]
+    if not words:
+        return None  # Return None for empty sequences
     preprocessed_text = ' '.join(words)
     print("Preprocessed Text:", preprocessed_text)
     return preprocessed_text
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
@@ -61,6 +62,11 @@ def predict_sentiment_route():
         text = data.get('text', '')
 
         preprocessed_text = preprocess_text(text)
+
+        if preprocessed_text is None:
+            print("Error: Empty preprocessed text")
+            return jsonify({'error': 'Empty preprocessed text'}), 400
+
         print("Preprocessed Text:", preprocessed_text)
 
         sequence = tokenizer.texts_to_sequences([preprocessed_text])
@@ -90,6 +96,7 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run()
