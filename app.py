@@ -47,7 +47,8 @@ def preprocess_text(text):
     words = word_tokenize(text)
     # Remove stopwords
     words = [word for word in words if word not in stop_words]
-    return ' '.join(words) if words else ''
+    preprocessed_text = ' '.join(words) if words else ''
+    return preprocessed_text
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
@@ -55,25 +56,14 @@ def predict_sentiment_route():
         data = request.get_json(force=True)
         text = data.get('text', '')
 
-        preprocessed_text, words = preprocess_text(text)
+        preprocessed_text = preprocess_text(text)
 
-        if preprocessed_text is None:
+        if not preprocessed_text:
             print("Error: Empty preprocessed text")
             return jsonify({'error': 'Empty preprocessed text'}), 400
 
         print("Preprocessed Text:", preprocessed_text)
 
-        if not words:
-            print("Error: No valid words after removing stopwords")
-            return jsonify({'error': 'No valid words after removing stopwords'}), 400
-
-        sequence = tokenizer.texts_to_sequences([preprocessed_text])
-
-        if not sequence or not sequence[0]:
-            print("Error: Unable to tokenize the input text")
-            return jsonify({'error': 'Unable to tokenize the input text'}), 400
-
-        print("Tokenized Sequence:", sequence)
 
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
         print("Padded Sequence:", padded_sequence)
