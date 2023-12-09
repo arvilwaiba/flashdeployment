@@ -40,7 +40,13 @@ stop_words = set(stopwords.words('english'))
 
 def preprocess_text(text):
     print("Original Text:", text)
-    # Your existing preprocessing code...
+    # Include your existing preprocessing code...
+    # For example:
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    words = word_tokenize(text)
+    words = [word for word in words if word not in stop_words]
+    preprocessed_text = ' '.join(words)
     print("Preprocessed Text:", preprocessed_text)
     return preprocessed_text
 
