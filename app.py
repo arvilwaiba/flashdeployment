@@ -31,14 +31,12 @@ run_with_ngrok(app)  # Start ngrok when the app is run
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_file_path = os.path.join(current_dir, 'model.h5')
 
+# Load the sentiment analysis model
 model = keras.models.load_model(model_file_path)
 
 max_words = 10000
 max_len = 100
 stop_words = set(stopwords.words('english'))
-
-# Load the sentiment analysis model
-sentiment_model = keras.models.load_model('sentiment_analysis_model.h5')
 
 def preprocess_text(text):
     # Convert to lowercase
@@ -69,7 +67,7 @@ def predict_sentiment_route():
 
         print("Padded Sequence:", padded_sequence)
 
-        prediction = sentiment_model.predict(padded_sequence)
+        prediction = model.predict(padded_sequence)
         predicted_label = np.argmax(prediction)
 
         sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
