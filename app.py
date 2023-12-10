@@ -87,7 +87,7 @@ def predict_sentiment_route():
 
         sequence = tokenizer.texts_to_sequences([preprocessed_text])
 
-        if not sequence or not sequence[0]:
+        if not sequence or len(sequence[0]) == 0:
             return jsonify({'error': 'Unable to tokenize the input text'}), 400
 
         logging.info("Tokenized Sequence: %s", sequence)
