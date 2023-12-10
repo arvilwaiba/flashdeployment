@@ -4,13 +4,13 @@ import traceback
 from flask import Flask, request, jsonify, Response, json
 from flask_cors import CORS
 from flask_ngrok import run_with_ngrok
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from tensorflow import keras
-from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.text import text_to_word_sequence
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 # Download stopwords
 try:
@@ -35,20 +35,21 @@ model = keras.models.load_model(model_file_path)
 
 max_words = 10000
 max_len = 100
-tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
 stop_words = set(stopwords.words('english'))
+
+# Load the sentiment analysis model
+sentiment_model = keras.models.load_model('sentiment_analysis_model.h5')
 
 def preprocess_text(text):
     # Convert to lowercase
     text = text.lower()
     # Remove special characters, numbers, and punctuation
     text = re.sub(r'[^a-zA-Z\s]', '', text)
-    # Tokenize
-    words = word_tokenize(text)
+    # Tokenize using text_to_word_sequence
+    words = text_to_word_sequence(text)
     # Remove stopwords
     words = [word for word in words if word not in stop_words]
-    preprocessed_text = ' '.join(words) if words else ''
-    return preprocessed_text
+    return ' '.join(words)
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
@@ -63,12 +64,7 @@ def predict_sentiment_route():
             return jsonify({'error': 'Empty preprocessed text'}), 400
 
         # Tokenize and pad sequence
-        sequence = tokenizer.texts_to_sequences([preprocessed_text])
-
-        if not sequence:
-            print("Error: Unable to convert text to sequence")
-            return jsonify({'error': 'Unable to convert text to sequence'}), 400
-
+        sequence = [preprocessed_text]
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
         print("Padded Sequence:", padded_sequence)
@@ -89,7 +85,6 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()
         return jsonify({'error': 'Internal Server Error'}), 500
-
 
 if __name__ == '__main__':
     app.run()
