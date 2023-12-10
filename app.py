@@ -38,6 +38,12 @@ max_words = 10000
 max_len = 100
 stop_words = set(stopwords.words('english'))
 
+# Load the tokenizer (assuming you saved it during training)
+tokenizer_path = 'path/to/your/tokenizer.json'
+with open(tokenizer_path, 'r') as f:
+    tokenizer_config = json.load(f)
+    tokenizer = Tokenizer.from_config(tokenizer_config)
+
 def preprocess_text(text):
     # Convert to lowercase
     text = text.lower()
@@ -87,7 +93,6 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()
         return jsonify({'error': 'Internal Server Error'}), 500
-
 
 if __name__ == '__main__':
     app.run()
