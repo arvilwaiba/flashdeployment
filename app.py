@@ -5,13 +5,12 @@ from flask import Flask, request, jsonify, Response, json
 from flask_cors import CORS
 from flask_ngrok import run_with_ngrok
 from tensorflow import keras
-from tensorflow.keras.preprocessing.text import text_to_word_sequence
+from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from tensorflow.keras.preprocessing.text import Tokenizer
 
 # Download stopwords
 try:
@@ -31,6 +30,7 @@ run_with_ngrok(app)  # Start ngrok when the app is run
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_file_path = os.path.join(current_dir, 'model.h5')
+tokenizer = None  # Tokenizer will be created dynamically
 
 # Load the sentiment analysis model
 model = keras.models.load_model(model_file_path)
@@ -39,28 +39,25 @@ max_words = 10000
 max_len = 100
 stop_words = set(stopwords.words('english'))
 
-# Attempt to load the tokenizer
-tokenizer_path = os.path.join(current_dir, 'tokenizer.json')
-
-if os.path.exists(tokenizer_path):
-    with open(tokenizer_path, 'r') as f:
-        tokenizer_config = json.load(f)
-        tokenizer = Tokenizer.from_config(tokenizer_config)
-else:
-    # Create and fit a new tokenizer
-    tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
-    tokenizer.fit_on_texts([""])  # Provide a dummy text to fit the tokenizer
-
 def preprocess_text(text):
     # Convert to lowercase
     text = text.lower()
     # Remove special characters, numbers, and punctuation
     text = re.sub(r'[^a-zA-Z\s]', '', text)
-    # Tokenize using text_to_word_sequence
-    words = text_to_word_sequence(text)
+    # Tokenize using nltk.word_tokenize
+    words = word_tokenize(text)
     # Remove stopwords
     words = [word for word in words if word not in stop_words]
     return ' '.join(words)
+
+def train_tokenizer(train_data):
+    global tokenizer
+    tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
+    tokenizer.fit_on_texts(train_data)
+
+# Dummy training data (replace this with your actual training data)
+train_data = ["This is a positive sentence.", "This is a negative sentence.", "This is a neutral sentence."]
+train_tokenizer(train_data)
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
