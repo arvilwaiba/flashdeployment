@@ -11,6 +11,7 @@ import numpy as np
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 # Download stopwords
 try:
@@ -38,11 +39,17 @@ max_words = 10000
 max_len = 100
 stop_words = set(stopwords.words('english'))
 
-# Load the tokenizer (assuming you saved it during training)
-tokenizer_path = 'path/to/your/tokenizer.json'
-with open(tokenizer_path, 'r') as f:
-    tokenizer_config = json.load(f)
-    tokenizer = Tokenizer.from_config(tokenizer_config)
+# Attempt to load the tokenizer
+tokenizer_path = os.path.join(current_dir, 'tokenizer.json')
+
+if os.path.exists(tokenizer_path):
+    with open(tokenizer_path, 'r') as f:
+        tokenizer_config = json.load(f)
+        tokenizer = Tokenizer.from_config(tokenizer_config)
+else:
+    # Create and fit a new tokenizer
+    tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
+    tokenizer.fit_on_texts([""])  # Provide a dummy text to fit the tokenizer
 
 def preprocess_text(text):
     # Convert to lowercase
