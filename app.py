@@ -62,7 +62,7 @@ def predict_sentiment_route():
             return jsonify({'error': 'Empty preprocessed text'}), 400
 
         # Tokenize and pad sequence
-        sequence = [preprocessed_text]
+        sequence = tokenizer.texts_to_sequences([preprocessed_text])
         padded_sequence = pad_sequences(sequence, maxlen=max_len, padding='post', truncating='post')
 
         print("Padded Sequence:", padded_sequence)
@@ -73,9 +73,13 @@ def predict_sentiment_route():
         sentiment_mapping = {0: 'negative', 1: 'neutral', 2: 'positive'}
         predicted_sentiment = sentiment_mapping[predicted_label]
 
+        print("Predicted Sentiment:", predicted_sentiment)
+
         response = Response(response=json.dumps({'sentiment': predicted_sentiment}),
                             status=200,
                             mimetype="application/json")
+
+        print("Entire Response:", response.response)
 
         return response
 
@@ -83,6 +87,7 @@ def predict_sentiment_route():
         print("Exception:", e)
         traceback.print_exc()
         return jsonify({'error': 'Internal Server Error'}), 500
+
 
 if __name__ == '__main__':
     app.run()
