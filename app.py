@@ -30,10 +30,8 @@ run_with_ngrok(app)  # Start ngrok when the app is run
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_file_path = os.path.join(current_dir, 'model.h5')
-tokenizer = None  # Tokenizer will be created dynamically
-
-# Load the sentiment analysis model
-model = keras.models.load_model(model_file_path)
+tokenizer = None  # Tokenizer will be created dynamically during app initialization
+model = None
 
 max_words = 10000
 max_len = 100
@@ -50,14 +48,20 @@ def preprocess_text(text):
     words = [word for word in words if word not in stop_words]
     return ' '.join(words)
 
-def train_tokenizer(train_data):
-    global tokenizer
+def initialize_models():
+    global model, tokenizer
+    # Load the sentiment analysis model
+    model = keras.models.load_model(model_file_path)
+
+    # Dummy training data (replace this with your actual training data)
+    train_data = ["This is a positive sentence.", "This is a negative sentence.", "This is a neutral sentence."]
+    
+    # Create and fit the tokenizer
     tokenizer = Tokenizer(num_words=max_words, oov_token="<OOV>")
     tokenizer.fit_on_texts(train_data)
 
-# Dummy training data (replace this with your actual training data)
-train_data = ["This is a positive sentence.", "This is a negative sentence.", "This is a neutral sentence."]
-train_tokenizer(train_data)
+# Initialize models when the app starts
+initialize_models()
 
 @app.route('/predict_sentiment', methods=['POST'])
 def predict_sentiment_route():
